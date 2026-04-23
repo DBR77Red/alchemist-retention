@@ -16,6 +16,27 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## Artifacts
+
+### Retention Alchemist (`artifacts/retention-alchemist`)
+- **Type**: react-vite (React + Vite web app)
+- **Preview path**: `/`
+- **Description**: Monte Carlo simulation dashboard for game designers to model monetization vs. retention
+- **Key files**:
+  - `src/services/simulationEngine.ts` — Pure TS Monte Carlo engine (1,000 agents, 30-day, tick-based Dopamine/Frustration)
+  - `src/context/SimulationContext.tsx` — React context with localStorage persistence
+  - `src/pages/Dashboard.tsx` — Bauhaus terminal dashboard with sliders, D1/D7/D30 metrics, Recharts retention curve
+  - `src/index.css` — Terminal aesthetic (JetBrains Mono, phosphor green/red, zero border-radius)
+- **Features**: Faucet/Sink sliders, D1/D7/D30 retention metrics, 30-day area chart, daily churn bar chart, localStorage state persistence, mobile-responsive
+
+### API Server (`artifacts/api-server`)
+- **Type**: Express 5 API
+- **Preview path**: `/api`
+
+### Canvas / Mockup Sandbox (`artifacts/mockup-sandbox`)
+- **Type**: Component preview server
+- **Preview path**: `/__mockup`
+
 ## Key Commands
 
 - `pnpm run typecheck` — full typecheck across all packages

@@ -1,0 +1,364 @@
+import { useSimulation } from "@/context/SimulationContext";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Loader2 } from "lucide-react";
+
+const FAUCET_COLOR = "#00ff9f";
+const SINK_COLOR = "#ff4d6d";
+
+function SliderRow({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+  accent,
+  unit,
+  testId,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (v: number) => void;
+  accent: string;
+  unit?: string;
+  testId: string;
+}) {
+  return (
+    <div className="slider-row" data-testid={testId}>
+      <div className="slider-header">
+        <span className="slider-label">{label}</span>
+        <span className="slider-value" style={{ color: accent }}>
+          {value}
+          {unit ?? "%"}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="terminal-slider"
+        style={
+          {
+            "--thumb-color": accent,
+            "--track-fill": accent,
+          } as React.CSSProperties
+        }
+        data-testid={`${testId}-input`}
+      />
+      <div className="slider-track-labels">
+        <span>{min}%</span>
+        <span>{max}%</span>
+      </div>
+    </div>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  subtitle,
+  testId,
+}: {
+  label: string;
+  value: string | number;
+  subtitle?: string;
+  testId: string;
+}) {
+  return (
+    <div className="metric-card" data-testid={testId}>
+      <div className="metric-label">{label}</div>
+      <div className="metric-value" data-testid={`${testId}-value`}>
+        {value}
+        {typeof value === "number" ? "%" : ""}
+      </div>
+      {subtitle && <div className="metric-subtitle">{subtitle}</div>}
+    </div>
+  );
+}
+
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: { value: number }[];
+  label?: string;
+}) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="chart-tooltip">
+        <div className="chart-tooltip-day">DAY {label}</div>
+        <div className="chart-tooltip-value">{payload[0].value.toFixed(1)}% RETAINED</div>
+      </div>
+    );
+  }
+  return null;
+}
+
+export default function Dashboard() {
+  const { config, result, isRunning, updateConfig, runSim } = useSimulation();
+
+  return (
+    <div className="dashboard">
+      <header className="dashboard-header">
+        <div className="header-inner">
+          <div className="header-brand">
+            <span className="brand-prefix">{">"}</span>
+            <span className="brand-name">RETENTION ALCHEMIST</span>
+            <span className="brand-version">v2.0</span>
+          </div>
+          <div className="header-meta">MONTE CARLO ENGINE · 1000 AGENTS · 30-DAY CYCLE</div>
+        </div>
+      </header>
+
+      <main className="dashboard-body">
+        <aside className="controls-panel">
+          <section className="control-section" data-testid="faucets-section">
+            <div className="section-header faucet-header">
+              <span className="section-icon">⬆</span>
+              <span className="section-title">FAUCETS</span>
+              <span className="section-sub">reward inputs</span>
+            </div>
+
+            <SliderRow
+              label="REWARD RATE"
+              value={config.rewardRate}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(v) => updateConfig({ rewardRate: v })}
+              accent={FAUCET_COLOR}
+              testId="slider-reward-rate"
+            />
+            <SliderRow
+              label="LOOT FREQUENCY"
+              value={config.lootFrequency}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(v) => updateConfig({ lootFrequency: v })}
+              accent={FAUCET_COLOR}
+              testId="slider-loot-frequency"
+            />
+            <SliderRow
+              label="DAILY BONUS"
+              value={config.dailyBonus}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(v) => updateConfig({ dailyBonus: v })}
+              accent={FAUCET_COLOR}
+              testId="slider-daily-bonus"
+            />
+          </section>
+
+          <div className="section-divider" />
+
+          <section className="control-section" data-testid="sinks-section">
+            <div className="section-header sink-header">
+              <span className="section-icon">⬇</span>
+              <span className="section-title">SINKS</span>
+              <span className="section-sub">friction inputs</span>
+            </div>
+
+            <SliderRow
+              label="ENERGY COST"
+              value={config.energyCost}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(v) => updateConfig({ energyCost: v })}
+              accent={SINK_COLOR}
+              testId="slider-energy-cost"
+            />
+            <SliderRow
+              label="SHOP PRICE"
+              value={config.shopPrice}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(v) => updateConfig({ shopPrice: v })}
+              accent={SINK_COLOR}
+              testId="slider-shop-price"
+            />
+            <SliderRow
+              label="AD FREQUENCY"
+              value={config.adFrequency}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(v) => updateConfig({ adFrequency: v })}
+              accent={SINK_COLOR}
+              testId="slider-ad-frequency"
+            />
+          </section>
+
+          <button
+            className="run-button"
+            onClick={runSim}
+            disabled={isRunning}
+            data-testid="button-run-simulation"
+          >
+            {isRunning ? (
+              <>
+                <Loader2 className="spin-icon" size={16} />
+                SIMULATING...
+              </>
+            ) : (
+              <>
+                <span className="run-arrow">▶</span>
+                RUN SIMULATION
+              </>
+            )}
+          </button>
+        </aside>
+
+        <section className="results-panel">
+          <div className="metrics-row">
+            <MetricCard
+              label="D1 RETENTION"
+              value={result ? result.d1 : "—"}
+              subtitle="day 1"
+              testId="metric-d1"
+            />
+            <MetricCard
+              label="D7 RETENTION"
+              value={result ? result.d7 : "—"}
+              subtitle="day 7"
+              testId="metric-d7"
+            />
+            <MetricCard
+              label="D30 RETENTION"
+              value={result ? result.d30 : "—"}
+              subtitle="day 30"
+              testId="metric-d30"
+            />
+          </div>
+
+          <div className="chart-panel" data-testid="chart-retention">
+            <div className="chart-header">
+              <span className="chart-title">30-DAY RETENTION CURVE</span>
+              {result && (
+                <span className="chart-subtitle">
+                  {PLAYER_COUNT_LABEL} agents simulated · {result.churned.reduce((a, b) => a + b, 0)} churned
+                </span>
+              )}
+            </div>
+
+            {result ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <AreaChart
+                  data={result.curve}
+                  margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="retentionGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00ff9f" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#00ff9f" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="#1a1a1a"
+                    horizontal
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fill: "#4a4a4a", fontSize: 10, fontFamily: "monospace" }}
+                    axisLine={{ stroke: "#222" }}
+                    tickLine={false}
+                    label={{
+                      value: "DAY",
+                      position: "insideBottom",
+                      offset: -2,
+                      fill: "#333",
+                      fontSize: 9,
+                      fontFamily: "monospace",
+                    }}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={{ fill: "#4a4a4a", fontSize: 10, fontFamily: "monospace" }}
+                    axisLine={{ stroke: "#222" }}
+                    tickLine={false}
+                    tickFormatter={(v) => `${v}%`}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="pct"
+                    stroke="#00ff9f"
+                    strokeWidth={2}
+                    fill="url(#retentionGrad)"
+                    dot={false}
+                    activeDot={{ r: 4, fill: "#00ff9f", stroke: "#000" }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chart-empty">
+                <div className="chart-empty-icon">⬡</div>
+                <div className="chart-empty-text">
+                  Configure parameters and run simulation to see results
+                </div>
+              </div>
+            )}
+          </div>
+
+          {result && (
+            <div className="churn-band" data-testid="churn-band">
+              <div className="churn-band-label">DAILY CHURN DISTRIBUTION</div>
+              <div className="churn-bars">
+                {result.churned.map((count, i) => {
+                  const maxChurn = Math.max(...result.churned, 1);
+                  const pct = (count / maxChurn) * 100;
+                  return (
+                    <div
+                      key={i}
+                      className="churn-bar-wrap"
+                      title={`Day ${i + 1}: ${count} churned`}
+                      data-testid={`churn-bar-day-${i + 1}`}
+                    >
+                      <div
+                        className="churn-bar"
+                        style={{ height: `${pct}%` }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="churn-axis">
+                <span>DAY 1</span>
+                <span>DAY 15</span>
+                <span>DAY 30</span>
+              </div>
+            </div>
+          )}
+        </section>
+      </main>
+
+      <footer className="dashboard-footer">
+        <span>DOPAMINE ↑ FRUSTRATION ↑ CHURN THRESHOLD: 1.4×</span>
+        <span>1000 AGENTS · TICK RESOLUTION: 24/DAY</span>
+      </footer>
+    </div>
+  );
+}
+
+const PLAYER_COUNT_LABEL = "1,000";
