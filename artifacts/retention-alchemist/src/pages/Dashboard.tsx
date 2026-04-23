@@ -60,6 +60,17 @@ function SliderRow({
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
+  useEffect(() => {
+    if (!isDragging) return;
+    const stop = () => setIsDragging(false);
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+    return () => {
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+    };
+  }, [isDragging]);
+
   return (
     <div className="slider-row" data-testid={testId}>
       <div className="slider-header">
@@ -94,10 +105,7 @@ function SliderRow({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        onMouseDown={() => setIsDragging(true)}
-        onMouseUp={() => setIsDragging(false)}
-        onTouchStart={() => setIsDragging(true)}
-        onTouchEnd={() => setIsDragging(false)}
+        onPointerDown={() => setIsDragging(true)}
         className={`terminal-slider${isDragging ? " is-dragging" : ""}`}
         style={
           {
