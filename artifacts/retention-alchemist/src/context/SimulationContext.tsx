@@ -21,16 +21,14 @@ function loadFromStorage<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
     if (raw) return JSON.parse(raw) as T;
-  } catch {
-  }
+  } catch {}
   return fallback;
 }
 
 function saveToStorage<T>(key: string, value: T): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-  }
+  } catch {}
 }
 
 export interface Preset {
@@ -96,7 +94,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
       setResult(res);
       setConfigDirty(false);
       setIsRunning(false);
-    }, 300);
+    }, 400);
   }, [config]);
 
   const savePreset = useCallback(
@@ -163,6 +161,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
 
 export function useSimulation(): SimulationContextValue {
   const ctx = useContext(SimulationContext);
-  if (!ctx) throw new Error("useSimulation must be used within SimulationProvider");
+  if (!ctx)
+    throw new Error("useSimulation must be used within SimulationProvider");
   return ctx;
 }

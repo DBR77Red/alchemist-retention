@@ -13,39 +13,77 @@ export interface DayRetention {
   pct: number;
 }
 
+export interface AgentEvent {
+  agentId: number;
+  day: number;
+  type: "churn" | "loot" | "spike" | "engaged";
+  message: string;
+}
+
 export interface SimulationResult {
   d1: number;
   d7: number;
   d30: number;
   curve: DayRetention[];
   churned: number[];
+  events: AgentEvent[];
 }
 
 const PLAYER_COUNT = 1000;
-const DOPAMINE_DECAY = 0.08;
-const FRUSTRATION_DECAY = 0.05;
-const CHURN_THRESHOLD = 1.4;
 const TICKS_PER_DAY = 24;
+const DAYS = 30;
+const MAX_EVENTS = 80;
+
+// Churn model calibration:
+// churnP = clamp(0.01, 0.98, CHURN_BASE - RESILIENCE_SCALE * r^RESILIENCE_POWER + frustPressure - dopaBonus)
+// Calibrated so default params → D1 ≈ 42-48%, D7 ≈ 15-20%, D30 ≈ 3-6%
+const CHURN_BASE = 1.50;
+const RESILIENCE_SCALE = 1.573;
+const RESILIENCE_POWER = 0.4;
+const FRUST_PRESSURE_SCALE = 1.8;
+const DOPAMINE_BONUS_SCALE = 0.91;
+const DOPAMINE_BONUS_THRESHOLD = 0.6;
 
 function seededRandom(seed: number): () => number {
-  let s = seed;
+  let s = (seed ^ 0xdeadbeef) >>> 0;
   return function () {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    s = Math.imul(s ^ (s >>> 16), 0x45d9f3b);
+    s = Math.imul(s ^ (s >>> 16), 0x45d9f3b);
+    s ^= s >>> 16;
     return (s >>> 0) / 0xffffffff;
   };
 }
 
+function computeSeed(config: SimulationConfig): number {
+  return Math.abs(
+    Math.floor(
+      config.rewardRate * 999983 +
+        config.lootFrequency * 49979 +
+        config.dailyBonus * 15013 +
+        config.energyCost * 7027 +
+        config.shopPrice * 4051 +
+        config.adFrequency * 2111
+    )
+  );
+}
+
 interface PlayerState {
+  id: number;
   dopamine: number;
   frustration: number;
+  resilience: number;
   churned: boolean;
   churnDay: number | null;
 }
 
-function initPlayer(rng: () => number): PlayerState {
+function initPlayer(rng: () => number, index: number): PlayerState {
+  // Resilience: 1-U^0.3 → PDF = (10/3)(1-r)^(7/3), most players low-resilience (casual)
+  const resilience = 1 - Math.pow(rng(), 0.3);
   return {
-    dopamine: 0.5 + rng() * 0.3,
-    frustration: 0.1 + rng() * 0.2,
+    id: index,
+    dopamine: 0.45 + rng() * 0.75,
+    frustration: rng() * 0.35,
+    resilience,
     churned: false,
     churnDay: null,
   };
@@ -56,90 +94,178 @@ function tickPlayer(
   config: SimulationConfig,
   rng: () => number,
   tick: number,
+  events: AgentEvent[],
   day: number
 ): void {
   if (player.churned) return;
 
-  const rewardChance = config.rewardRate / 100;
-  const lootChance = config.lootFrequency / 100;
-  const adChance = config.adFrequency / 100;
-  const energyDrain = config.energyCost / 100;
-  const shopDrain = (config.shopPrice / 100) * 0.03;
+  // Dopamine: logarithmic recovery — diminishing returns when already high
+  player.dopamine *= 1 - 0.2 / TICKS_PER_DAY;
 
-  player.dopamine *= 1 - DOPAMINE_DECAY / TICKS_PER_DAY;
-  player.frustration *= 1 - FRUSTRATION_DECAY / TICKS_PER_DAY;
+  // Frustration: MUCH stronger decay (15%/day) to prevent compounding
+  player.frustration *= 1 - 0.15 / TICKS_PER_DAY;
 
-  if (rng() < rewardChance / TICKS_PER_DAY) {
-    player.dopamine += 0.12 + rng() * 0.08;
-  }
-
-  if (rng() < lootChance / TICKS_PER_DAY) {
-    player.dopamine += 0.18 + rng() * 0.12;
-  }
-
+  // Daily login bonus (once per day)
   if (tick === 0) {
-    player.dopamine += (config.dailyBonus / 100) * (0.15 + rng() * 0.1);
+    player.dopamine += (config.dailyBonus / 100) * 0.22;
   }
 
-  if (rng() < energyDrain / TICKS_PER_DAY) {
-    player.frustration += 0.06 + rng() * 0.04;
+  // Standard reward (logarithmic boost — diminishing returns)
+  if (rng() < (config.rewardRate / 100) / TICKS_PER_DAY) {
+    const boost = Math.log(1 + player.dopamine * 0.5 + 0.5) * 0.1;
+    player.dopamine += boost;
   }
 
-  if (rng() < adChance / TICKS_PER_DAY) {
-    player.frustration += 0.04 + rng() * 0.03;
-  }
-
-  player.frustration += shopDrain / TICKS_PER_DAY;
-
-  player.dopamine = Math.max(0, Math.min(3.0, player.dopamine));
-  player.frustration = Math.max(0, Math.min(3.0, player.frustration));
-
-  if (player.frustration > player.dopamine * CHURN_THRESHOLD) {
-    if (rng() < 0.15) {
-      player.churned = true;
-      player.churnDay = day;
+  // Loot drop (bigger spike)
+  if (rng() < (config.lootFrequency / 100) / TICKS_PER_DAY) {
+    const boost = Math.log(1.8) * 0.2;
+    player.dopamine += boost;
+    if (events.length < MAX_EVENTS && rng() < 0.22) {
+      events.push({
+        agentId: player.id,
+        day: day + 1,
+        type: "loot",
+        message: `Loot drop! Dopamine spiked to ${Math.min(player.dopamine, 2.0).toFixed(2)}`,
+      });
     }
   }
+
+  // Energy cost — LINEAR frustration (no exponential scaling to prevent compounding)
+  if (rng() < (config.energyCost / 100) / TICKS_PER_DAY) {
+    player.frustration += 0.05;
+    if (events.length < MAX_EVENTS && player.frustration > 0.5 && rng() < 0.10) {
+      events.push({
+        agentId: player.id,
+        day: day + 1,
+        type: "spike",
+        message: `Energy wall hit. Frustration: ${Math.min(player.frustration, 2.0).toFixed(2)}`,
+      });
+    }
+  }
+
+  // Ad interruption — LINEAR
+  if (rng() < (config.adFrequency / 100) / TICKS_PER_DAY) {
+    player.frustration += 0.03;
+  }
+
+  // Shop price — continuous linear drain
+  player.frustration += (config.shopPrice / 100) * 0.0008;
+
+  player.dopamine = Math.max(0, Math.min(2.0, player.dopamine));
+  player.frustration = Math.max(0, Math.min(2.0, player.frustration));
+}
+
+const CHURN_REASONS: Record<string, string[]> = {
+  frustrated: [
+    "Frustration critical. Uninstalling.",
+    "This game is too punishing. Done.",
+    "Ad overload. Leaving.",
+    "Energy system hostile. Quitting.",
+    "Friction too high. Goodbye.",
+  ],
+  bored: [
+    "Lost interest. Novelty gone.",
+    "Nothing engaging left. Idle.",
+    "Dopamine depleted. Moving on.",
+    "Engagement faded. Exiting.",
+    "Loop got stale. Uninstalled.",
+  ],
+  casual: [
+    "Never really committed. Bye.",
+    "Just passing through.",
+    "Tried it once. Not for me.",
+    "Low attachment. Uninstalled.",
+    "Opened it twice. Done.",
+  ],
+};
+
+function pick<T>(arr: T[], rng: () => number): T {
+  return arr[Math.floor(rng() * arr.length)];
 }
 
 export function runSimulation(config: SimulationConfig): SimulationResult {
-  const seed = Math.floor(
-    config.rewardRate * 1000 +
-      config.lootFrequency * 100 +
-      config.dailyBonus * 10 +
-      config.energyCost * 7 +
-      config.shopPrice * 3 +
-      config.adFrequency * 13
-  );
-  const rng = seededRandom(seed ^ 0xdeadbeef);
+  const seed = computeSeed(config);
+  const rng = seededRandom(seed);
 
-  const players: PlayerState[] = Array.from({ length: PLAYER_COUNT }, () =>
-    initPlayer(rng)
+  const players: PlayerState[] = Array.from({ length: PLAYER_COUNT }, (_, i) =>
+    initPlayer(rng, i)
   );
 
-  const churnedOnDay: number[] = new Array(30).fill(0);
+  const churnedOnDay: number[] = new Array(DAYS).fill(0);
+  const events: AgentEvent[] = [];
 
-  for (let day = 0; day < 30; day++) {
+  for (let day = 0; day < DAYS; day++) {
+    // Run intra-day ticks for game state + event generation
     for (let tick = 0; tick < TICKS_PER_DAY; tick++) {
       for (const player of players) {
-        if (!player.churned) {
-          tickPlayer(player, config, rng, tick, day);
-        }
+        tickPlayer(player, config, rng, tick, events, day);
       }
     }
 
-    const churnedToday = players.filter(
-      (p) => p.churned && p.churnDay === day
-    ).length;
-    churnedOnDay[day] = churnedToday;
+    // Daily churn check — nonlinear resilience formula
+    for (const player of players) {
+      if (player.churned) continue;
+
+      // Frustration pressure: quadratic, capped (strong but bounded)
+      const frustPressure =
+        Math.pow(Math.max(0, player.frustration), 2) * FRUST_PRESSURE_SCALE;
+
+      // Dopamine bonus: reduces churn when dopamine is above threshold
+      const dopamineBonus =
+        (player.dopamine - DOPAMINE_BONUS_THRESHOLD) * DOPAMINE_BONUS_SCALE;
+
+      // Churn probability: concave in resilience (casual players churn much more than average)
+      const churnP = Math.max(
+        0.01,
+        Math.min(
+          0.98,
+          CHURN_BASE -
+            RESILIENCE_SCALE * Math.pow(player.resilience, RESILIENCE_POWER) +
+            frustPressure -
+            dopamineBonus
+        )
+      );
+
+      if (rng() < churnP) {
+        player.churned = true;
+        player.churnDay = day;
+        churnedOnDay[day]++;
+
+        if (events.length < MAX_EVENTS) {
+          const isFrustrated = player.frustration > player.dopamine * 1.1;
+          const isBored = player.dopamine < 0.4;
+          const category = isFrustrated
+            ? "frustrated"
+            : isBored
+              ? "bored"
+              : "casual";
+          events.push({
+            agentId: player.id,
+            day: day + 1,
+            type: "churn",
+            message: pick(CHURN_REASONS[category], rng),
+          });
+        }
+      } else if (
+        events.length < MAX_EVENTS &&
+        player.dopamine > 1.1 &&
+        rng() < 0.006
+      ) {
+        events.push({
+          agentId: player.id,
+          day: day + 1,
+          type: "engaged",
+          message: `High engagement sustained. Dopamine: ${player.dopamine.toFixed(2)}`,
+        });
+      }
+    }
   }
 
   const curve: DayRetention[] = [];
   let retained = PLAYER_COUNT;
 
-  for (let day = 0; day < 30; day++) {
-    retained -= churnedOnDay[day];
-    retained = Math.max(0, retained);
+  for (let day = 0; day < DAYS; day++) {
+    retained = Math.max(0, retained - churnedOnDay[day]);
     curve.push({
       day: day + 1,
       retained,
@@ -151,7 +277,7 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
   const d7 = curve[6]?.pct ?? 100;
   const d30 = curve[29]?.pct ?? 100;
 
-  return { d1, d7, d30, curve, churned: churnedOnDay };
+  return { d1, d7, d30, curve, churned: churnedOnDay, events };
 }
 
 export function getDefaultConfig(): SimulationConfig {
