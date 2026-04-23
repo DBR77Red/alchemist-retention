@@ -517,6 +517,237 @@ body {
   letter-spacing: 0.08em;
 }
 
+/* ── PRESET SAVE PANEL ── */
+
+.preset-save-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preset-save-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.preset-save-icon {
+  color: var(--amber);
+  font-size: 11px;
+}
+
+.preset-save-title {
+  color: var(--amber);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.preset-save-row {
+  display: flex;
+  gap: 8px;
+}
+
+.preset-name-input {
+  flex: 1;
+  background: var(--bg-section);
+  border: 1px solid var(--border-bright);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 7px 10px;
+  outline: none;
+  border-radius: 0;
+  transition: border-color var(--transition);
+  min-width: 0;
+}
+
+.preset-name-input::placeholder {
+  color: var(--text-faint);
+}
+
+.preset-name-input:focus {
+  border-color: var(--amber);
+}
+
+.preset-name-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.preset-save-btn {
+  background: transparent;
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 7px 14px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.preset-save-btn:hover:not(:disabled) {
+  background: rgba(255, 183, 0, 0.1);
+}
+
+.preset-save-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.preset-save-hint {
+  color: var(--text-faint);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+}
+
+/* ── PRESETS COMPARISON PANEL ── */
+
+.presets-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.presets-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.presets-panel-title {
+  color: var(--text-dim);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.presets-panel-count {
+  color: var(--text-faint);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.presets-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.preset-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+.preset-row:last-child {
+  border-bottom: none;
+}
+
+.preset-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.preset-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.preset-name {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.preset-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.preset-load-btn {
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.preset-load-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.preset-delete-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 0;
+  line-height: 1;
+  transition: color var(--transition);
+}
+
+.preset-delete-btn:hover {
+  color: var(--red);
+}
+
+.preset-metrics {
+  display: flex;
+  gap: 20px;
+}
+
+.preset-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preset-metric-label {
+  color: var(--text-faint);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.preset-metric-value {
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
 /* ── SCROLLBAR ── */
 
 ::-webkit-scrollbar {

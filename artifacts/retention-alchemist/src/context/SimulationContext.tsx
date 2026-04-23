@@ -15,6 +15,7 @@ import {
 
 const CONFIG_KEY = "retention_alchemist_config";
 const RESULT_KEY = "retention_alchemist_result";
+const PRESETS_KEY = "retention_alchemist_presets";
 
 function loadFromStorage<T>(key: string, fallback: T): T {
   try {
@@ -32,12 +33,27 @@ function saveToStorage<T>(key: string, value: T): void {
   }
 }
 
+export interface Preset {
+  id: string;
+  name: string;
+  config: SimulationConfig;
+  d1: number;
+  d7: number;
+  d30: number;
+  savedAt: number;
+}
+
 interface SimulationContextValue {
   config: SimulationConfig;
   result: SimulationResult | null;
   isRunning: boolean;
+  configDirty: boolean;
   updateConfig: (partial: Partial<SimulationConfig>) => void;
   runSim: () => void;
+  presets: Preset[];
+  savePreset: (name: string) => void;
+  loadPreset: (id: string) => void;
+  deletePreset: (id: string) => void;
 }
 
 const SimulationContext = createContext<SimulationContextValue | null>(null);
@@ -50,6 +66,10 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     loadFromStorage(RESULT_KEY, null)
   );
   const [isRunning, setIsRunning] = useState(false);
+  const [configDirty, setConfigDirty] = useState(false);
+  const [presets, setPresets] = useState<Preset[]>(() =>
+    loadFromStorage(PRESETS_KEY, [])
+  );
 
   useEffect(() => {
     saveToStorage(CONFIG_KEY, config);
@@ -59,8 +79,13 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     if (result) saveToStorage(RESULT_KEY, result);
   }, [result]);
 
+  useEffect(() => {
+    saveToStorage(PRESETS_KEY, presets);
+  }, [presets]);
+
   const updateConfig = useCallback((partial: Partial<SimulationConfig>) => {
     setConfig((prev) => ({ ...prev, ...partial }));
+    setConfigDirty(true);
   }, []);
 
   const runSim = useCallback(() => {
@@ -68,13 +93,58 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     setTimeout(() => {
       const res = runSimulation(config);
       setResult(res);
+      setConfigDirty(false);
       setIsRunning(false);
     }, 300);
   }, [config]);
 
+  const savePreset = useCallback(
+    (name: string) => {
+      if (!result || configDirty) return;
+      const preset: Preset = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name: name.trim() || "Unnamed Preset",
+        config: { ...config },
+        d1: result.d1,
+        d7: result.d7,
+        d30: result.d30,
+        savedAt: Date.now(),
+      };
+      setPresets((prev) => [preset, ...prev]);
+    },
+    [config, result, configDirty]
+  );
+
+  const loadPreset = useCallback(
+    (id: string) => {
+      const preset = presets.find((p) => p.id === id);
+      if (!preset) return;
+      setConfig({ ...preset.config });
+      const res = runSimulation(preset.config);
+      setResult(res);
+      setConfigDirty(false);
+    },
+    [presets]
+  );
+
+  const deletePreset = useCallback((id: string) => {
+    setPresets((prev) => prev.filter((p) => p.id !== id));
+  }, []);
+
   return (
     <SimulationContext.Provider
-      value={{ config, result, isRunning, updateConfig, runSim }}
+      value={{
+        config,
+        result,
+        isRunning,
+        configDirty,
+        updateConfig,
+        runSim,
+        presets,
+        savePreset,
+        loadPreset,
+        deletePreset,
+      }}
     >
       {children}
     </SimulationContext.Provider>

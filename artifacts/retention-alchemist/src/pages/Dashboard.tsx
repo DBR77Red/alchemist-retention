@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSimulation } from "@/context/SimulationContext";
 import {
   AreaChart,
@@ -108,6 +109,116 @@ function CustomTooltip({
     );
   }
   return null;
+}
+
+function SavePresetPanel() {
+  const { result, configDirty, savePreset } = useSimulation();
+  const [name, setName] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const canSave = !!result && !configDirty;
+
+  function handleSave() {
+    if (!canSave) return;
+    savePreset(name);
+    setName("");
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1800);
+  }
+
+  return (
+    <div className="preset-save-panel" data-testid="preset-save-panel">
+      <div className="preset-save-header">
+        <span className="preset-save-icon">◈</span>
+        <span className="preset-save-title">SAVE PRESET</span>
+      </div>
+      <div className="preset-save-row">
+        <input
+          type="text"
+          className="preset-name-input"
+          placeholder="preset name…"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSave()}
+          maxLength={40}
+          disabled={!canSave}
+          data-testid="preset-name-input"
+        />
+        <button
+          className="preset-save-btn"
+          onClick={handleSave}
+          disabled={!canSave}
+          data-testid="button-save-preset"
+        >
+          {saved ? "SAVED" : "SAVE"}
+        </button>
+      </div>
+      {!result && (
+        <div className="preset-save-hint">Run a simulation first to save a preset.</div>
+      )}
+      {result && configDirty && (
+        <div className="preset-save-hint">Re-run simulation to save current settings.</div>
+      )}
+    </div>
+  );
+}
+
+function PresetsPanel() {
+  const { presets, loadPreset, deletePreset } = useSimulation();
+
+  if (presets.length === 0) return null;
+
+  return (
+    <div className="presets-panel" data-testid="presets-panel">
+      <div className="presets-panel-header">
+        <span className="presets-panel-title">SAVED PRESETS</span>
+        <span className="presets-panel-count">{presets.length} saved</span>
+      </div>
+      <div className="presets-list">
+        {presets.map((preset) => (
+          <div className="preset-row" key={preset.id} data-testid={`preset-row-${preset.id}`}>
+            <div className="preset-row-top">
+              <span className="preset-name" title={preset.name}>
+                {preset.name}
+              </span>
+              <div className="preset-actions">
+                <button
+                  className="preset-load-btn"
+                  onClick={() => loadPreset(preset.id)}
+                  data-testid={`button-load-preset-${preset.id}`}
+                  title="Load this preset into sliders"
+                >
+                  LOAD
+                </button>
+                <button
+                  className="preset-delete-btn"
+                  onClick={() => deletePreset(preset.id)}
+                  data-testid={`button-delete-preset-${preset.id}`}
+                  title="Delete preset"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div className="preset-metrics">
+              <div className="preset-metric">
+                <span className="preset-metric-label">D1</span>
+                <span className="preset-metric-value">{preset.d1}%</span>
+              </div>
+              <div className="preset-metric">
+                <span className="preset-metric-label">D7</span>
+                <span className="preset-metric-value">{preset.d7}%</span>
+              </div>
+              <div className="preset-metric">
+                <span className="preset-metric-label">D30</span>
+                <span className="preset-metric-value">{preset.d30}%</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function Dashboard() {
@@ -226,6 +337,10 @@ export default function Dashboard() {
               </>
             )}
           </button>
+
+          <div className="section-divider" />
+
+          <SavePresetPanel />
         </aside>
 
         <section className="results-panel">
@@ -350,6 +465,8 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+
+          <PresetsPanel />
         </section>
       </main>
 
