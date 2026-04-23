@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSimulation } from "@/context/SimulationContext";
 import {
   AreaChart,
@@ -16,6 +16,7 @@ const SINK_COLOR = "#ff4d6d";
 
 function SliderRow({
   label,
+  tooltip,
   value,
   min,
   max,
@@ -26,6 +27,7 @@ function SliderRow({
   testId,
 }: {
   label: string;
+  tooltip: string;
   value: number;
   min: number;
   max: number;
@@ -35,10 +37,38 @@ function SliderRow({
   unit?: string;
   testId: string;
 }) {
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const labelRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!tooltipOpen) return;
+    function handleOutside(e: MouseEvent) {
+      if (labelRef.current && !labelRef.current.contains(e.target as Node)) {
+        setTooltipOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [tooltipOpen]);
+
   return (
     <div className="slider-row" data-testid={testId}>
       <div className="slider-header">
-        <span className="slider-label">{label}</span>
+        <span
+          className="slider-label-wrap"
+          ref={labelRef}
+          onMouseEnter={() => setTooltipOpen(true)}
+          onMouseLeave={() => setTooltipOpen(false)}
+          onTouchStart={(e) => { e.preventDefault(); setTooltipOpen((v) => !v); }}
+        >
+          <span className="slider-label">{label}</span>
+          <span className="slider-tooltip-icon" aria-label="Parameter info">?</span>
+          {tooltipOpen && (
+            <span className="slider-tooltip-box" role="tooltip">
+              {tooltip}
+            </span>
+          )}
+        </span>
         <span className="slider-value" style={{ color: accent }}>
           {value}
           {unit ?? "%"}
@@ -248,6 +278,7 @@ export default function Dashboard() {
 
             <SliderRow
               label="REWARD RATE"
+              tooltip="Chance per tick that a player earns a standard reward, raising their dopamine level. Higher values sustain engagement and slow natural dopamine decay."
               value={config.rewardRate}
               min={0}
               max={100}
@@ -258,6 +289,7 @@ export default function Dashboard() {
             />
             <SliderRow
               label="LOOT FREQUENCY"
+              tooltip="Probability per tick of a random loot drop, which delivers a larger dopamine spike than a standard reward. Loot creates excitement loops that keep players coming back."
               value={config.lootFrequency}
               min={0}
               max={100}
@@ -268,6 +300,7 @@ export default function Dashboard() {
             />
             <SliderRow
               label="DAILY BONUS"
+              tooltip="A dopamine boost granted at the start of each simulated day. Models login rewards that incentivize daily return visits from players."
               value={config.dailyBonus}
               min={0}
               max={100}
@@ -289,6 +322,7 @@ export default function Dashboard() {
 
             <SliderRow
               label="ENERGY COST"
+              tooltip="Chance per tick that an energy gate triggers a frustration increase. High energy costs make players feel blocked, accelerating churn when frustration exceeds dopamine."
               value={config.energyCost}
               min={0}
               max={100}
@@ -299,6 +333,7 @@ export default function Dashboard() {
             />
             <SliderRow
               label="SHOP PRICE"
+              tooltip="A continuous frustration drain modeling the burden of in-game purchase prices. Higher values steadily erode player satisfaction over the 30-day cycle."
               value={config.shopPrice}
               min={0}
               max={100}
@@ -309,6 +344,7 @@ export default function Dashboard() {
             />
             <SliderRow
               label="AD FREQUENCY"
+              tooltip="Probability per tick that a player sees an ad, raising their frustration level. Too many ads push frustration past the churn threshold and drive players to quit."
               value={config.adFrequency}
               min={0}
               max={100}
