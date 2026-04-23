@@ -192,7 +192,7 @@ function LiveAgentFeed({ events }: { events: AgentEvent[] | undefined }) {
       <div className="agent-feed-header">
         <span className="agent-feed-icon">◉</span>
         <span className="agent-feed-title">LIVE AGENT FEED</span>
-        <span className="agent-feed-count">{events.length} EVENTS</span>
+        <span className="agent-feed-count">{safeEvents.length} EVENTS</span>
       </div>
       <div className="agent-feed-log" ref={feedRef}>
         {reversed.map((ev, i) => (
