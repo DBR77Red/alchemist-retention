@@ -885,6 +885,113 @@ body {
   line-height: 1.1;
 }
 
+/* ── COMPARE PRESETS CHART ── */
+
+.compare-chart-panel {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  padding: 20px;
+}
+
+.compare-chart-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.compare-chart-icon {
+  color: var(--green);
+  font-size: 14px;
+}
+
+.compare-chart-title {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.compare-chart-sub {
+  color: var(--text-dim);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  margin-left: auto;
+}
+
+.compare-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.compare-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px 4px 7px;
+  cursor: pointer;
+  transition: border-color var(--transition), opacity var(--transition);
+}
+
+.compare-toggle-btn:hover {
+  border-color: var(--accent, var(--green));
+}
+
+.compare-toggle-btn--hidden {
+  opacity: 0.45;
+}
+
+.compare-toggle-btn--hidden:hover {
+  opacity: 0.75;
+}
+
+.compare-toggle-swatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.compare-toggle-label {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compare-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 1px 0;
+}
+
+.compare-tooltip-name {
+  opacity: 0.85;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compare-tooltip-value {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
 /* ── SCROLLBAR ── */
 
 ::-webkit-scrollbar {

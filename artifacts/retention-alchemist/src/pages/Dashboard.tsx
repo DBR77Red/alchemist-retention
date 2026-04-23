@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSimulation } from "@/context/SimulationContext";
+import type { Preset } from "@/context/SimulationContext";
 import {
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -13,6 +16,17 @@ import { Loader2 } from "lucide-react";
 
 const FAUCET_COLOR = "#00ff9f";
 const SINK_COLOR = "#ff4d6d";
+
+const PRESET_COLORS = [
+  "#00ff9f",
+  "#ff4d6d",
+  "#ffb700",
+  "#7c85ff",
+  "#00d4ff",
+  "#ff9f00",
+  "#b4ff6e",
+  "#ff6ec4",
+];
 
 function SliderRow({
   label,
@@ -324,6 +338,147 @@ function PresetsPanel() {
   );
 }
 
+function CompareTooltip({
+  active,
+  payload,
+  label,
+  presets,
+}: {
+  active?: boolean;
+  payload?: { dataKey: string; value: number; name: string; fill: string }[];
+  label?: string;
+  presets: Preset[];
+}) {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div className="chart-tooltip">
+      <div className="chart-tooltip-day">{label} RETENTION</div>
+      {payload.map((entry) => {
+        const preset = presets.find((p) => p.id === entry.dataKey);
+        return (
+          <div
+            key={entry.dataKey}
+            className="compare-tooltip-row"
+            style={{ color: entry.fill }}
+          >
+            <span className="compare-tooltip-name">{preset?.name ?? entry.name}</span>
+            <span className="compare-tooltip-value">{entry.value?.toFixed(1)}%</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PresetsCompareChart() {
+  const { presets } = useSimulation();
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
+
+  if (presets.length < 2) return null;
+
+  const chartData = [
+    {
+      metric: "D1",
+      ...Object.fromEntries(presets.map((p) => [p.id, hidden.has(p.id) ? undefined : p.d1])),
+    },
+    {
+      metric: "D7",
+      ...Object.fromEntries(presets.map((p) => [p.id, hidden.has(p.id) ? undefined : p.d7])),
+    },
+    {
+      metric: "D30",
+      ...Object.fromEntries(presets.map((p) => [p.id, hidden.has(p.id) ? undefined : p.d30])),
+    },
+  ];
+
+  function togglePreset(id: string) {
+    setHidden((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  return (
+    <div className="compare-chart-panel" data-testid="compare-chart-panel">
+      <div className="compare-chart-header">
+        <span className="compare-chart-icon">◈</span>
+        <span className="compare-chart-title">COMPARE PRESETS</span>
+        <span className="compare-chart-sub">D1 · D7 · D30 RETENTION</span>
+      </div>
+
+      <div className="compare-toggles" data-testid="compare-toggles">
+        {presets.map((preset, i) => {
+          const color = PRESET_COLORS[i % PRESET_COLORS.length];
+          const isHidden = hidden.has(preset.id);
+          return (
+            <button
+              key={preset.id}
+              className={`compare-toggle-btn${isHidden ? " compare-toggle-btn--hidden" : ""}`}
+              style={{ "--accent": color } as React.CSSProperties}
+              onClick={() => togglePreset(preset.id)}
+              data-testid={`toggle-compare-${preset.id}`}
+              title={isHidden ? "Show in chart" : "Hide from chart"}
+            >
+              <span
+                className="compare-toggle-swatch"
+                style={{
+                  background: isHidden ? "transparent" : color,
+                  borderColor: color,
+                }}
+              />
+              <span className="compare-toggle-label">{preset.name}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 8, right: 8, left: -10, bottom: 0 }}
+          barCategoryGap="28%"
+          barGap={3}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" horizontal vertical={false} />
+          <XAxis
+            dataKey="metric"
+            tick={{ fill: "#666", fontSize: 10, fontFamily: "monospace" }}
+            axisLine={{ stroke: "#222" }}
+            tickLine={false}
+          />
+          <YAxis
+            domain={[0, 100]}
+            tick={{ fill: "#4a4a4a", fontSize: 10, fontFamily: "monospace" }}
+            axisLine={{ stroke: "#222" }}
+            tickLine={false}
+            tickFormatter={(v) => `${v}%`}
+          />
+          <Tooltip
+            content={<CompareTooltip presets={presets} />}
+            cursor={{ fill: "rgba(255,255,255,0.03)" }}
+          />
+          {presets.map((preset, i) => {
+            if (hidden.has(preset.id)) return null;
+            const color = PRESET_COLORS[i % PRESET_COLORS.length];
+            return (
+              <Bar
+                key={preset.id}
+                dataKey={preset.id}
+                name={preset.name}
+                fill={color}
+                radius={[2, 2, 0, 0]}
+                maxBarSize={36}
+              />
+            );
+          })}
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const { config, result, isRunning, updateConfig, runSim } = useSimulation();
 
@@ -576,6 +731,7 @@ export default function Dashboard() {
           )}
 
           <PresetsPanel />
+          <PresetsCompareChart />
         </section>
       </main>
 
