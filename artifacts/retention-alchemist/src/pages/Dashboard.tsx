@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useSimulation } from "@/context/SimulationContext";
 import {
   AreaChart,
@@ -193,6 +193,81 @@ function SavePresetPanel() {
   );
 }
 
+function PresetNameEditor({
+  id,
+  name,
+}: {
+  id: string;
+  name: string;
+}) {
+  const { renamePreset } = useSimulation();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(name);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editing]);
+
+  const commit = useCallback(() => {
+    const trimmed = draft.trim();
+    if (trimmed && trimmed !== name) {
+      renamePreset(id, trimmed);
+    } else {
+      setDraft(name);
+    }
+    setEditing(false);
+  }, [draft, id, name, renamePreset]);
+
+  const cancel = useCallback(() => {
+    setDraft(name);
+    setEditing(false);
+  }, [name]);
+
+  if (editing) {
+    return (
+      <div className="preset-name-editor">
+        <input
+          ref={inputRef}
+          className="preset-rename-input"
+          value={draft}
+          maxLength={40}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit();
+            if (e.key === "Escape") cancel();
+          }}
+          onBlur={commit}
+          data-testid={`preset-rename-input-${id}`}
+        />
+        <button
+          className="preset-rename-confirm-btn"
+          onMouseDown={(e) => { e.preventDefault(); commit(); }}
+          title="Confirm rename"
+          data-testid={`button-rename-confirm-${id}`}
+        >
+          ✓
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <span
+      className="preset-name preset-name-editable"
+      title="Click to rename"
+      onClick={() => { setDraft(name); setEditing(true); }}
+      data-testid={`preset-name-${id}`}
+    >
+      {name}
+      <span className="preset-edit-icon" aria-hidden="true">✎</span>
+    </span>
+  );
+}
+
 function PresetsPanel() {
   const { presets, loadPreset, deletePreset } = useSimulation();
 
@@ -208,9 +283,7 @@ function PresetsPanel() {
         {presets.map((preset) => (
           <div className="preset-row" key={preset.id} data-testid={`preset-row-${preset.id}`}>
             <div className="preset-row-top">
-              <span className="preset-name" title={preset.name}>
-                {preset.name}
-              </span>
+              <PresetNameEditor id={preset.id} name={preset.name} />
               <div className="preset-actions">
                 <button
                   className="preset-load-btn"

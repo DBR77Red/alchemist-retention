@@ -791,6 +791,74 @@ body {
   color: var(--red);
 }
 
+.preset-name-editable {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.preset-name-editable:hover {
+  color: var(--green);
+}
+
+.preset-edit-icon {
+  font-size: 10px;
+  opacity: 0;
+  color: var(--text-faint);
+  transition: opacity var(--transition);
+  line-height: 1;
+}
+
+.preset-name-editable:hover .preset-edit-icon {
+  opacity: 1;
+}
+
+.preset-name-editor {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.preset-rename-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--green);
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 0;
+  outline: none;
+}
+
+.preset-rename-input:focus {
+  border-bottom-color: var(--green);
+}
+
+.preset-rename-confirm-btn {
+  background: transparent;
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 0;
+  line-height: 1;
+  transition: background var(--transition), color var(--transition);
+}
+
+.preset-rename-confirm-btn:hover {
+  background: var(--green);
+  color: #000;
+}
+
 .preset-metrics {
   display: flex;
   gap: 20px;

@@ -54,6 +54,7 @@ interface SimulationContextValue {
   savePreset: (name: string) => void;
   loadPreset: (id: string) => void;
   deletePreset: (id: string) => void;
+  renamePreset: (id: string, newName: string) => void;
 }
 
 const SimulationContext = createContext<SimulationContextValue | null>(null);
@@ -131,6 +132,14 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     setPresets((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
+  const renamePreset = useCallback((id: string, newName: string) => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setPresets((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, name: trimmed } : p))
+    );
+  }, []);
+
   return (
     <SimulationContext.Provider
       value={{
@@ -144,6 +153,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
         savePreset,
         loadPreset,
         deletePreset,
+        renamePreset,
       }}
     >
       {children}
