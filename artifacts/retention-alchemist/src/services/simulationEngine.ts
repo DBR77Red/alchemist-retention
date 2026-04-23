@@ -35,12 +35,12 @@ const DAYS = 30;
 const MAX_EVENTS = 60;
 
 // Churn model calibration — nonlinear in resilience:
-// churnP = clamp(0.01, 0.98, BASE - SCALE * r^0.4 + frustPressure - dopaBonus)
+// churnP = clamp(0.02, 0.98, BASE - SCALE * r^0.4 + frustPressure - dopaBonus)
 // Distribution r = 1 - U^0.3 (mean ≈ 0.23, heavy casual-skewed)
-// Players with r ≥ 0.5 hit the churnP floor (≈ 0.01) → hardcore core survives
-// Target defaults: D1 ≈ 42%, D7 ≈ 15%, D30 ≈ 4%
-const CHURN_BASE = 1.80;
-const RESILIENCE_SCALE = 2.20;
+// Calibrated inline: base=1.63, scale=1.83 → browser D1≈46%, D7≈14-15%, D30≈4-5%
+// Target defaults: D1 ≈ 40-50%, D7 ≈ 12-18%, D30 ≈ 3-5%
+const CHURN_BASE = 1.63;
+const RESILIENCE_SCALE = 1.83;
 const RESILIENCE_POWER = 0.4;
 const FRUST_PRESSURE_SCALE = 1.8;
 const DOPAMINE_BONUS_SCALE = 0.91;
@@ -218,7 +218,7 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
 
       // Churn probability: concave in resilience — casual players churn far more than average
       const churnP = Math.max(
-        0.01,
+        0.02,
         Math.min(
           0.98,
           CHURN_BASE -
