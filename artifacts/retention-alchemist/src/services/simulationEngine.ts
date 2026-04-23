@@ -32,13 +32,15 @@ export interface SimulationResult {
 const PLAYER_COUNT = 1000;
 const TICKS_PER_DAY = 24;
 const DAYS = 30;
-const MAX_EVENTS = 80;
+const MAX_EVENTS = 60;
 
-// Churn model calibration:
-// churnP = clamp(0.01, 0.98, CHURN_BASE - RESILIENCE_SCALE * r^RESILIENCE_POWER + frustPressure - dopaBonus)
-// Calibrated so default params → D1 ≈ 42-48%, D7 ≈ 15-20%, D30 ≈ 3-6%
-const CHURN_BASE = 1.50;
-const RESILIENCE_SCALE = 1.573;
+// Churn model calibration — nonlinear in resilience:
+// churnP = clamp(0.01, 0.98, BASE - SCALE * r^0.4 + frustPressure - dopaBonus)
+// Distribution r = 1 - U^0.3 (mean ≈ 0.23, heavy casual-skewed)
+// Players with r ≥ 0.5 hit the churnP floor (≈ 0.01) → hardcore core survives
+// Target defaults: D1 ≈ 42%, D7 ≈ 15%, D30 ≈ 4%
+const CHURN_BASE = 1.80;
+const RESILIENCE_SCALE = 2.20;
 const RESILIENCE_POWER = 0.4;
 const FRUST_PRESSURE_SCALE = 1.8;
 const DOPAMINE_BONUS_SCALE = 0.91;
@@ -77,7 +79,7 @@ interface PlayerState {
 }
 
 function initPlayer(rng: () => number, index: number): PlayerState {
-  // Resilience: 1-U^0.3 → PDF = (10/3)(1-r)^(7/3), most players low-resilience (casual)
+  // Resilience: 1-U^0.3 → PDF = (10/3)(1-r)^(7/3), casual-skewed (mean ≈ 0.23)
   const resilience = 1 - Math.pow(rng(), 0.3);
   return {
     id: index,
@@ -99,13 +101,13 @@ function tickPlayer(
 ): void {
   if (player.churned) return;
 
-  // Dopamine: logarithmic recovery — diminishing returns when already high
+  // Dopamine: logarithmic decay (diminishing returns on recovery when already high)
   player.dopamine *= 1 - 0.2 / TICKS_PER_DAY;
 
-  // Frustration: MUCH stronger decay (15%/day) to prevent compounding
+  // Frustration: strong decay (15%/day) to prevent long-term compounding
   player.frustration *= 1 - 0.15 / TICKS_PER_DAY;
 
-  // Daily login bonus (once per day)
+  // Daily login bonus (once per day, first tick)
   if (tick === 0) {
     player.dopamine += (config.dailyBonus / 100) * 0.22;
   }
@@ -130,9 +132,9 @@ function tickPlayer(
     }
   }
 
-  // Energy cost — LINEAR frustration (no exponential scaling to prevent compounding)
+  // Energy cost — EXPONENTIAL frustration scaling: bad games punish harder as frustration grows
   if (rng() < (config.energyCost / 100) / TICKS_PER_DAY) {
-    player.frustration += 0.05;
+    player.frustration += 0.020 * Math.pow(1 + player.frustration, 1.2);
     if (events.length < MAX_EVENTS && player.frustration > 0.5 && rng() < 0.10) {
       events.push({
         agentId: player.id,
@@ -143,12 +145,12 @@ function tickPlayer(
     }
   }
 
-  // Ad interruption — LINEAR
+  // Ad interruption — EXPONENTIAL scaling (ads compound irritation)
   if (rng() < (config.adFrequency / 100) / TICKS_PER_DAY) {
-    player.frustration += 0.03;
+    player.frustration += 0.012 * Math.pow(1 + player.frustration, 1.1);
   }
 
-  // Shop price — continuous linear drain
+  // Shop price — continuous linear drain (constant transaction friction)
   player.frustration += (config.shopPrice / 100) * 0.0008;
 
   player.dopamine = Math.max(0, Math.min(2.0, player.dopamine));
@@ -206,15 +208,15 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
     for (const player of players) {
       if (player.churned) continue;
 
-      // Frustration pressure: quadratic, capped (strong but bounded)
+      // Frustration pressure: quadratic (exponential growth in ticks creates elevated floor)
       const frustPressure =
         Math.pow(Math.max(0, player.frustration), 2) * FRUST_PRESSURE_SCALE;
 
-      // Dopamine bonus: reduces churn when dopamine is above threshold
+      // Dopamine bonus: reward for high engagement
       const dopamineBonus =
         (player.dopamine - DOPAMINE_BONUS_THRESHOLD) * DOPAMINE_BONUS_SCALE;
 
-      // Churn probability: concave in resilience (casual players churn much more than average)
+      // Churn probability: concave in resilience — casual players churn far more than average
       const churnP = Math.max(
         0.01,
         Math.min(

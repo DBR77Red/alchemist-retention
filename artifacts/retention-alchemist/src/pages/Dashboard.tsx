@@ -177,7 +177,7 @@ function RetentionTooltip({
 function LiveAgentFeed({ events }: { events: AgentEvent[] | undefined }) {
   const feedRef = useRef<HTMLDivElement>(null);
   const safeEvents = events ?? [];
-  const reversed = [...safeEvents].reverse();
+  const reversed = [...safeEvents].reverse().slice(0, 40);
 
   useEffect(() => {
     if (feedRef.current) {
