@@ -20,7 +20,7 @@ export interface ChallengeSpec {
   availableSliders: (keyof SimulationConfig)[];
   lockedSliderValues?: Partial<SimulationConfig>;
   gradingDimensions: GradingDimension[];
-  dimensionWeights: Record<string, number>;
+  dimensionWeights: Partial<Record<GradingDimension["metric"], number>>;
 }
 
 // Threshold calibration notes:
@@ -206,7 +206,6 @@ export const CHALLENGE_SPECS: ChallengeSpec[] = [
     availableSliders: [
       "rewardRate",
       "lootFrequency",
-      "ecpm",
       "dailyBonus",
       "energyCost",
       "shopPrice",
