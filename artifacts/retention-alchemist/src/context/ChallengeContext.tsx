@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import type { Grade } from "@/data/challengeSpecs";
 import { getRank, CHALLENGE_SPECS } from "@/data/challengeSpecs";
+import { GRADE_NUMERIC } from "@/services/gradeEngine";
 
 const UNLOCKED_KEY = "ra_unlocked_challenges";
 const GRADES_KEY = "ra_best_grades";
@@ -30,8 +31,6 @@ interface ChallengeContextValue {
 }
 
 const ChallengeContext = createContext<ChallengeContextValue | null>(null);
-
-const GRADE_NUMERIC: Record<Grade, number> = { S: 5, A: 4, B: 3, C: 2, F: 1 };
 
 export function ChallengeProvider({ children }: { children: ReactNode }) {
   // Level 1 (hc) is always unlocked

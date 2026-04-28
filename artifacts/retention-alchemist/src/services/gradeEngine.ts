@@ -15,7 +15,7 @@ export interface GradeResult {
   passed: boolean;
 }
 
-const GRADE_NUMERIC: Record<Grade, number> = { S: 5, A: 4, B: 3, C: 2, F: 1 };
+export const GRADE_NUMERIC: Record<Grade, number> = { S: 5, A: 4, B: 3, C: 2, F: 1 };
 const NUMERIC_GRADE: [number, Grade][] = [
   [4.5, "S"],
   [3.5, "A"],
