@@ -5,6 +5,10 @@ export interface SimulationConfig {
   energyCost: number;
   shopPrice: number;
   adFrequency: number;
+  // Revenue sliders (new)
+  ecpm: number;          // 0–20, ad revenue per impression (in $×0.001)
+  iapRate: number;       // 0–100, base % of players willing to convert
+  avgPurchaseValue: number; // 1–50, average $ per IAP transaction
 }
 
 export interface DayRetention {
@@ -27,6 +31,13 @@ export interface SimulationResult {
   curve: DayRetention[];
   churned: number[];
   events: AgentEvent[];
+  // Revenue fields (new)
+  arpu: number;
+  arppu: number;
+  ltv: number;
+  iapConvRate: number;
+  adRevTotal: number;
+  lootSpikeCount: number;
 }
 
 const PLAYER_COUNT = 1000;
@@ -64,7 +75,10 @@ function computeSeed(config: SimulationConfig): number {
         config.dailyBonus * 15013 +
         config.energyCost * 7027 +
         config.shopPrice * 4051 +
-        config.adFrequency * 2111
+        config.adFrequency * 2111 +
+        config.ecpm * 1013 +
+        config.iapRate * 503 +
+        config.avgPurchaseValue * 251
     )
   );
 }
@@ -76,18 +90,29 @@ interface PlayerState {
   resilience: number;
   churned: boolean;
   churnDay: number | null;
+  // Revenue fields (new)
+  spent: number;
+  hasPurchased: boolean;
+  conversionDay: number; // day they will convert, -1 if never
+  adRev: number;
 }
 
-function initPlayer(rng: () => number, index: number): PlayerState {
-  // Resilience: 1-U^0.3 → PDF = (10/3)(1-r)^(7/3), casual-skewed (mean ≈ 0.23)
+function initPlayer(rng: () => number, index: number, config: SimulationConfig): PlayerState {
   const resilience = 1 - Math.pow(rng(), 0.3);
+  const dopamine = 0.45 + rng() * 0.75;
+  const willConvert = rng() < (config.iapRate / 100) * Math.min(dopamine, 1.2);
+  const conversionDay = willConvert ? Math.floor(rng() * DAYS) : -1;
   return {
     id: index,
-    dopamine: 0.45 + rng() * 0.75,
+    dopamine,
     frustration: rng() * 0.35,
     resilience,
     churned: false,
     churnDay: null,
+    spent: 0,
+    hasPurchased: false,
+    conversionDay,
+    adRev: 0,
   };
 }
 
@@ -97,7 +122,8 @@ function tickPlayer(
   rng: () => number,
   tick: number,
   events: AgentEvent[],
-  day: number
+  day: number,
+  counters: { lootSpikes: number }
 ): void {
   if (player.churned) return;
 
@@ -120,6 +146,7 @@ function tickPlayer(
 
   // Loot drop (bigger spike)
   if (rng() < (config.lootFrequency / 100) / TICKS_PER_DAY) {
+    counters.lootSpikes++;
     const boost = Math.log(1.8) * 0.2;
     player.dopamine += boost;
     if (events.length < MAX_EVENTS && rng() < 0.22) {
@@ -152,6 +179,11 @@ function tickPlayer(
 
   // Shop price — continuous linear drain (constant transaction friction)
   player.frustration += (config.shopPrice / 100) * 0.0008;
+
+  // Ad revenue: each fired ad impression earns ecpm * 0.001 dollars
+  if (rng() < (config.adFrequency / 100) / TICKS_PER_DAY) {
+    player.adRev += config.ecpm * 0.001;
+  }
 
   player.dopamine = Math.max(0, Math.min(2.0, player.dopamine));
   player.frustration = Math.max(0, Math.min(2.0, player.frustration));
@@ -190,17 +222,28 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
   const rng = seededRandom(seed);
 
   const players: PlayerState[] = Array.from({ length: PLAYER_COUNT }, (_, i) =>
-    initPlayer(rng, i)
+    initPlayer(rng, i, config)
   );
 
   const churnedOnDay: number[] = new Array(DAYS).fill(0);
   const events: AgentEvent[] = [];
+  let lootSpikeCount = 0;
+
+  const counters = { lootSpikes: 0 };
 
   for (let day = 0; day < DAYS; day++) {
     // Run intra-day ticks for game state + event generation
     for (let tick = 0; tick < TICKS_PER_DAY; tick++) {
       for (const player of players) {
-        tickPlayer(player, config, rng, tick, events, day);
+        tickPlayer(player, config, rng, tick, events, day, counters);
+      }
+    }
+
+    // IAP purchase: player reaches their conversion day
+    for (const player of players) {
+      if (!player.churned && day === player.conversionDay) {
+        player.spent += config.avgPurchaseValue;
+        player.hasPurchased = true;
       }
     }
 
@@ -263,6 +306,8 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
     }
   }
 
+  lootSpikeCount = counters.lootSpikes;
+
   const curve: DayRetention[] = [];
   let retained = PLAYER_COUNT;
 
@@ -279,7 +324,18 @@ export function runSimulation(config: SimulationConfig): SimulationResult {
   const d7 = curve[6]?.pct ?? 100;
   const d30 = curve[29]?.pct ?? 100;
 
-  return { d1, d7, d30, curve, churned: churnedOnDay, events };
+  const totalIap = players.reduce((s, p) => s + p.spent, 0);
+  const totalAd = players.reduce((s, p) => s + p.adRev, 0);
+  const totalRev = totalIap + totalAd;
+  const payingPlayers = players.filter((p) => p.hasPurchased).length;
+
+  const arpu = totalRev / PLAYER_COUNT;
+  const arppu = payingPlayers > 0 ? totalIap / payingPlayers : 0;
+  const ltv = arpu; // equivalent to ARPU in a closed 30-day cohort simulation
+  const iapConvRate = (payingPlayers / PLAYER_COUNT) * 100;
+  const adRevTotal = totalAd;
+
+  return { d1, d7, d30, curve, churned: churnedOnDay, events, arpu, arppu, ltv, iapConvRate, adRevTotal, lootSpikeCount };
 }
 
 export function getDefaultConfig(): SimulationConfig {
@@ -290,5 +346,8 @@ export function getDefaultConfig(): SimulationConfig {
     energyCost: 40,
     shopPrice: 50,
     adFrequency: 25,
+    ecpm: 5,
+    iapRate: 2,
+    avgPurchaseValue: 2,
   };
 }
