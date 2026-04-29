@@ -58,9 +58,10 @@ interface SimulationContextValue {
 const SimulationContext = createContext<SimulationContextValue | null>(null);
 
 export function SimulationProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<SimulationConfig>(() =>
-    loadFromStorage(CONFIG_KEY, getDefaultConfig())
-  );
+  const [config, setConfig] = useState<SimulationConfig>(() => {
+    const loaded = loadFromStorage(CONFIG_KEY, getDefaultConfig());
+    return { ...getDefaultConfig(), ...loaded };
+  });
   const [result, setResult] = useState<SimulationResult | null>(() =>
     loadFromStorage(RESULT_KEY, null)
   );
