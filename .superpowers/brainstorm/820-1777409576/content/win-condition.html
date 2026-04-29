@@ -1,0 +1,31 @@
+<h2>How do you "win" a challenge?</h2>
+<p class="subtitle">You've run the simulation — what does the result screen look like?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Pass / Fail</h3>
+      <p>Each challenge has hard targets. Hit all of them → you pass and unlock the next. Miss any → fail and try again. Clean, binary, no ambiguity.</p>
+      <p style="color:#666;font-size:0.85em;margin-top:8px">Example: <em>"D7 ≥ 18% AND ARPU ≥ $1.20 AND churn spike &lt; day 3"</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Letter Grade (S / A / B / C / F)</h3>
+      <p>Each challenge scores you across multiple dimensions. You need at least a C to unlock the next, but S-rank requires truly optimized play. Encourages replaying for perfection.</p>
+      <p style="color:#666;font-size:0.85em;margin-top:8px">Example: <em>Retention B+ · Revenue A · Balance C → overall B"</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Weighted Score (0–100)</h3>
+      <p>A single numeric score per run, calculated from a weighted formula across all metrics. A threshold score unlocks the next challenge. High scores go on a personal best board.</p>
+      <p style="color:#666;font-size:0.85em;margin-top:8px">Example: <em>"Score: 74 / 100 — Unlock threshold: 60 — Personal best: 81"</em></p>
+    </div>
+  </div>
+</div>

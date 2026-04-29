@@ -1,0 +1,60 @@
+<h2>Which game archetypes should the 3–5 challenges cover?</h2>
+<p class="subtitle">Each archetype becomes a challenge with its own brief, target slider ranges, and grading thresholds. Select 3–5.</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="hypercasual" onclick="toggleSelect(this)">
+    <div class="letter">HC</div>
+    <div class="content">
+      <h3>Hypercasual</h3>
+      <p>Mass installs, razor-thin sessions, almost pure ad monetization. Low retention is expected — revenue comes from volume. The opening challenge.</p>
+      <p style="color:#ffb700;font-size:0.8em;margin-top:6px">Win condition flavor: "D1 ≥ 35%, Ad Revenue ≥ $X, ARPU &gt; $0.08"</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="idle" onclick="toggleSelect(this)">
+    <div class="letter">IDLE</div>
+    <div class="content">
+      <h3>Idle / Incremental</h3>
+      <p>Long sessions, slow dopamine drip, strong daily bonus dependency. Good D7/D30 is the goal. Light IAP, low frustration tolerance.</p>
+      <p style="color:#ffb700;font-size:0.8em;margin-top:6px">Win condition flavor: "D30 ≥ 8%, LTV ≥ $0.80, frustration events &lt; threshold"</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="midcore" onclick="toggleSelect(this)">
+    <div class="letter">MID</div>
+    <div class="content">
+      <h3>Mid-Core RPG</h3>
+      <p>Energy gates, loot systems, moderate IAP conversion. Needs a careful balance of frustration and reward. The "difficult" challenge — many dials to tune.</p>
+      <p style="color:#ffb700;font-size:0.8em;margin-top:6px">Win condition flavor: "D7 ≥ 18%, ARPPU ≥ $8, conversion ≥ 2%"</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="gacha" onclick="toggleSelect(this)">
+    <div class="letter">GTCH</div>
+    <div class="content">
+      <h3>Gacha / Collectible</h3>
+      <p>Loot frequency is the core loop. High ARPPU from whales, low overall conversion. Retention lives and dies on the dopamine spike cadence.</p>
+      <p style="color:#ffb700;font-size:0.8em;margin-top:6px">Win condition flavor: "Loot spikes ≥ X, ARPPU ≥ $15, D30 ≥ 5%"</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="puzzle" onclick="toggleSelect(this)">
+    <div class="letter">PZL</div>
+    <div class="content">
+      <h3>Casual Puzzle</h3>
+      <p>Ad-heavy, low IAP, very high D1 expectations. Energy cost and ad frequency tension is the core design challenge. Broad audience, low tolerance for friction.</p>
+      <p style="color:#ffb700;font-size:0.8em;margin-top:6px">Win condition flavor: "D1 ≥ 45%, Ad Revenue ≥ $X, IAP conv ≥ 1%"</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="subscription" onclick="toggleSelect(this)">
+    <div class="letter">SUB</div>
+    <div class="content">
+      <h3>Subscription / Premium</h3>
+      <p>Zero ads, zero energy walls, high shop price. Revenue comes entirely from a paying base. Retention is everything — churned players don't renew.</p>
+      <p style="color:#ffb700;font-size:0.8em;margin-top:6px">Win condition flavor: "D30 ≥ 12%, LTV ≥ $4, ad frequency = 0"</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:24px">Pick 3–5. The order you select roughly becomes the difficulty progression.</p>

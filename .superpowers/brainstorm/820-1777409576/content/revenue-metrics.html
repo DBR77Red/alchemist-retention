@@ -1,0 +1,51 @@
+<h2>Which revenue metrics should the simulation track?</h2>
+<p class="subtitle">These become both the grading dimensions and the new dashboard metrics. Select all that feel essential.</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="arpu" onclick="toggleSelect(this)">
+    <div class="letter">$</div>
+    <div class="content">
+      <h3>ARPU — Avg Revenue Per User</h3>
+      <p>Total revenue ÷ total players. The standard top-line mobile metric. Combines IAP and ad revenue into one number.</p>
+      <p style="color:#39ff14;font-size:0.8em;margin-top:6px">Industry benchmark: $0.05–$3.00 depending on genre</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="arppu" onclick="toggleSelect(this)">
+    <div class="letter">$+</div>
+    <div class="content">
+      <h3>ARPPU — Avg Revenue Per Paying User</h3>
+      <p>Revenue ÷ players who actually spent. Shows how much your paying cohort spends, independent of conversion rate.</p>
+      <p style="color:#39ff14;font-size:0.8em;margin-top:6px">Industry benchmark: $5–$25 for mid-core games</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="ltv" onclick="toggleSelect(this)">
+    <div class="letter">LTV</div>
+    <div class="content">
+      <h3>LTV — Lifetime Value</h3>
+      <p>Average revenue generated per player before they churn. The most important metric for UA spend decisions.</p>
+      <p style="color:#39ff14;font-size:0.8em;margin-top:6px">LTV &gt; CPI = profitable growth</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="conv" onclick="toggleSelect(this)">
+    <div class="letter">%</div>
+    <div class="content">
+      <h3>IAP Conversion Rate</h3>
+      <p>% of players who made at least one purchase. Low conversion + high ARPPU = whale game. High conversion + low ARPPU = mass-market.</p>
+      <p style="color:#39ff14;font-size:0.8em;margin-top:6px">Industry range: 0.5%–5% typical</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="adrev" onclick="toggleSelect(this)">
+    <div class="letter">AD</div>
+    <div class="content">
+      <h3>Ad Revenue</h3>
+      <p>Total revenue from ad impressions across retained players. Driven by ad frequency × retained cohort × eCPM slider.</p>
+      <p style="color:#39ff14;font-size:0.8em;margin-top:6px">Key for hypercasual and hybrid monetization</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:24px">Select as many as you want — these will become grading dimensions in challenge mode.</p>

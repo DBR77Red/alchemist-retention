@@ -1,0 +1,93 @@
+<h2>Design — Section 5: Career Hub UI</h2>
+<p class="subtitle">The / route — your progression board. All 6 challenges + sandbox entry.</p>
+
+<div class="mockup">
+  <div class="mockup-header" style="display:flex;justify-content:space-between;align-items:center">
+    <span>>_ RETENTION ALCHEMIST — CAREER MODE</span>
+    <span style="font-size:10px;color:#555">DESIGNER RANK: JUNIOR → SENIOR → DIRECTOR</span>
+  </div>
+  <div class="mockup-body" style="padding:16px;font-family:monospace;font-size:11px">
+
+    <!-- rank bar -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:8px;border:1px solid #1a1a2e">
+      <div>
+        <span style="color:#555;font-size:9px">CAREER RANK</span>
+        <div style="color:#ffb700">JUNIOR DESIGNER</div>
+      </div>
+      <div style="flex:1;margin:0 16px;height:4px;background:#1a1a2e;position:relative">
+        <div style="width:35%;height:100%;background:#ffb700"></div>
+      </div>
+      <div style="color:#555;font-size:9px">2 / 6 CHALLENGES CLEARED</div>
+    </div>
+
+    <!-- challenge grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+
+      <!-- completed -->
+      <div style="border:1px solid #39ff14;padding:10px;position:relative">
+        <div style="font-size:9px;color:#555">LEVEL 1 · COMPLETE</div>
+        <div style="color:#ccc;font-weight:bold;margin:4px 0">HYPERCASUAL</div>
+        <div style="font-size:9px;color:#555;margin-bottom:8px">Ad-driven volume play. Tune for mass reach.</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:9px;color:#555">BEST GRADE</div>
+          <div style="font-size:22px;color:#39ff14;font-weight:bold">S</div>
+        </div>
+        <div style="border:1px solid #39ff14;padding:4px 8px;text-align:center;color:#39ff14;font-size:10px;margin-top:6px;cursor:pointer">↺ REPLAY</div>
+      </div>
+
+      <!-- completed, lower grade -->
+      <div style="border:1px solid #ffb700;padding:10px;position:relative">
+        <div style="font-size:9px;color:#555">LEVEL 2 · COMPLETE</div>
+        <div style="color:#ccc;font-weight:bold;margin:4px 0">CASUAL PUZZLE</div>
+        <div style="font-size:9px;color:#555;margin-bottom:8px">Balance ads and light IAP. High D1 is key.</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:9px;color:#555">BEST GRADE</div>
+          <div style="font-size:22px;color:#ffb700;font-weight:bold">B</div>
+        </div>
+        <div style="border:1px solid #ffb700;padding:4px 8px;text-align:center;color:#ffb700;font-size:10px;margin-top:6px;cursor:pointer">↺ RETRY FOR A</div>
+      </div>
+
+      <!-- active -->
+      <div style="border:2px solid #00d4ff;padding:10px;position:relative;box-shadow:0 0 12px rgba(0,212,255,0.15)">
+        <div style="font-size:9px;color:#00d4ff">LEVEL 3 · ACTIVE ◉</div>
+        <div style="color:#ccc;font-weight:bold;margin:4px 0">IDLE / INCREMENTAL</div>
+        <div style="font-size:9px;color:#555;margin-bottom:8px">Long sessions, daily hook. Keep frustration zero.</div>
+        <div style="font-size:9px;color:#555;margin-bottom:6px">UNLOCKS: energyCost slider</div>
+        <div style="border:1px solid #00d4ff;padding:4px 8px;text-align:center;color:#00d4ff;font-size:10px;cursor:pointer">▶ START CHALLENGE</div>
+      </div>
+
+      <!-- locked -->
+      <div style="border:1px solid #252535;padding:10px;opacity:0.45">
+        <div style="font-size:9px;color:#333">LEVEL 4 · LOCKED</div>
+        <div style="color:#555;font-weight:bold;margin:4px 0">MID-CORE RPG</div>
+        <div style="font-size:9px;color:#333;margin-bottom:8px">Energy gates + IAP balance. Many dials.</div>
+        <div style="font-size:9px;color:#333">🔒 Clear Level 3 to unlock</div>
+      </div>
+
+      <div style="border:1px solid #1e1e2e;padding:10px;opacity:0.25">
+        <div style="font-size:9px;color:#222">LEVEL 5 · LOCKED</div>
+        <div style="color:#333;font-weight:bold;margin:4px 0">GACHA</div>
+        <div style="font-size:9px;color:#222;margin-bottom:8px">Whale economy. Loot spike cadence.</div>
+        <div style="font-size:9px;color:#222">🔒 Clear Level 4 to unlock</div>
+      </div>
+
+      <div style="border:1px solid #161626;padding:10px;opacity:0.15">
+        <div style="font-size:9px;color:#222">LEVEL 6 · LOCKED</div>
+        <div style="color:#333;font-weight:bold;margin:4px 0">SUBSCRIPTION</div>
+        <div style="font-size:9px;color:#111;margin-bottom:8px">Zero ads. Pure retention play.</div>
+        <div style="font-size:9px;color:#111">🔒 Clear Level 5 to unlock</div>
+      </div>
+    </div>
+
+    <!-- sandbox entry -->
+    <div style="border:1px solid #2a2a3a;padding:10px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="color:#555;font-size:9px">FREE PLAY</div>
+        <div style="color:#ccc">SANDBOX MODE</div>
+        <div style="color:#555;font-size:9px">All sliders. No objectives. Pure experimentation.</div>
+      </div>
+      <div style="border:1px solid #555;padding:6px 14px;color:#555;font-size:10px;cursor:pointer">ENTER SANDBOX →</div>
+    </div>
+
+  </div>
+</div>

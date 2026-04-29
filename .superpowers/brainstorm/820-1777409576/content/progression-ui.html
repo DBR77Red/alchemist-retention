@@ -1,0 +1,84 @@
+<h2>What does the challenge hub look like?</h2>
+<p class="subtitle">The screen you see before entering a challenge — your progression map</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Linear Track</h3>
+      <div class="mockup">
+        <div class="mockup-header">CAREER MODE — GAME DESIGNER</div>
+        <div class="mockup-body" style="display:flex;gap:8px;align-items:center;padding:12px;flex-wrap:wrap">
+          <div style="text-align:center;opacity:1">
+            <div style="width:52px;height:52px;border:2px solid #39ff14;display:flex;align-items:center;justify-content:center;font-size:10px;color:#39ff14;margin:0 auto">HC<br/>S</div>
+            <div style="font-size:9px;color:#555;margin-top:4px">DONE</div>
+          </div>
+          <div style="color:#444;font-size:18px">→</div>
+          <div style="text-align:center;opacity:1">
+            <div style="width:52px;height:52px;border:2px solid #ffb700;display:flex;align-items:center;justify-content:center;font-size:10px;color:#ffb700;margin:0 auto">PZL<br/>▶</div>
+            <div style="font-size:9px;color:#ffb700;margin-top:4px">ACTIVE</div>
+          </div>
+          <div style="color:#333;font-size:18px">→</div>
+          <div style="text-align:center;opacity:0.35">
+            <div style="width:52px;height:52px;border:2px solid #444;display:flex;align-items:center;justify-content:center;font-size:10px;color:#444;margin:0 auto">IDLE<br/>🔒</div>
+            <div style="font-size:9px;color:#333;margin-top:4px">LOCKED</div>
+          </div>
+          <div style="color:#222;font-size:18px">→</div>
+          <div style="text-align:center;opacity:0.35">
+            <div style="width:52px;height:52px;border:2px solid #333;display:flex;align-items:center;justify-content:center;font-size:10px;color:#333;margin:0 auto">MID<br/>🔒</div>
+            <div style="font-size:9px;color:#222;margin-top:4px">LOCKED</div>
+          </div>
+          <div style="color:#222;font-size:18px">→</div>
+          <div style="text-align:center;opacity:0.2">
+            <div style="width:52px;height:52px;border:2px solid #222;display:flex;align-items:center;justify-content:center;font-size:10px;color:#333;margin:0 auto">GTCH<br/>🔒</div>
+          </div>
+          <div style="color:#222;font-size:18px">→</div>
+          <div style="text-align:center;opacity:0.1">
+            <div style="width:52px;height:52px;border:2px solid #222;display:flex;align-items:center;justify-content:center;font-size:10px;color:#333;margin:0 auto">SUB<br/>🔒</div>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:8px">Horizontal strip. Your current challenge is highlighted. Completed ones show grade. Locked ones are dimmed. Simple, always visible.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Career Board</h3>
+      <div class="mockup">
+        <div class="mockup-header">STUDIO ROSTER — SELECT BRIEF</div>
+        <div class="mockup-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px">
+          <div style="border:1px solid #39ff14;padding:8px;font-size:10px;color:#39ff14">
+            <div style="font-size:9px;color:#555">LEVEL 1 · COMPLETE</div>
+            <div style="font-weight:bold">HYPERCASUAL</div>
+            <div style="color:#39ff14;margin-top:2px">GRADE: S</div>
+          </div>
+          <div style="border:1px solid #ffb700;padding:8px;font-size:10px;color:#ffb700">
+            <div style="font-size:9px;color:#ffb700">LEVEL 2 · ACTIVE</div>
+            <div style="font-weight:bold">CASUAL PUZZLE</div>
+            <div style="color:#555;margin-top:2px">BEST: B</div>
+          </div>
+          <div style="border:1px solid #333;padding:8px;font-size:10px;color:#444;opacity:0.5">
+            <div style="font-size:9px;color:#333">LEVEL 3 · LOCKED</div>
+            <div style="font-weight:bold">IDLE RPG</div>
+            <div style="color:#333;margin-top:2px">——</div>
+          </div>
+          <div style="border:1px solid #222;padding:8px;font-size:10px;color:#333;opacity:0.3">
+            <div style="font-size:9px">LEVEL 4 · LOCKED</div>
+            <div>MID-CORE</div>
+          </div>
+          <div style="border:1px solid #222;padding:8px;font-size:10px;color:#333;opacity:0.2">
+            <div style="font-size:9px">LEVEL 5 · LOCKED</div>
+            <div>GACHA</div>
+          </div>
+          <div style="border:1px solid #222;padding:8px;font-size:10px;color:#333;opacity:0.1">
+            <div style="font-size:9px">LEVEL 6 · LOCKED</div>
+            <div>SUBSCRIPTION</div>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:8px">Grid of challenge cards. Each shows level, archetype, and best grade. Unlocked challenges can be replayed for a better grade.</p>
+    </div>
+  </div>
+</div>

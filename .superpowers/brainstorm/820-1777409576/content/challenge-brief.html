@@ -1,0 +1,97 @@
+<h2>Design — Section 3: Challenge Specs</h2>
+<p class="subtitle">What the player sees when they enter a challenge — brief card at top, grade overlay after simulation</p>
+
+<div class="section">
+  <h3>Challenge Brief Header (inside ChallengePage)</h3>
+  <div class="mockup">
+    <div class="mockup-header">LEVEL 3 — IDLE / INCREMENTAL</div>
+    <div class="mockup-body" style="padding:14px;font-family:monospace;font-size:11px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="color:#555;font-size:9px;margin-bottom:6px">BRIEF</div>
+        <div style="color:#ccc;line-height:1.6">Your studio is launching an idle RPG. Players expect a slow, satisfying drip of rewards with a strong daily hook. Keep frustration near zero — idle players have zero tolerance for energy walls. Revenue comes from light IAP, not ads.</div>
+      </div>
+      <div>
+        <div style="color:#555;font-size:9px;margin-bottom:6px">WIN CONDITIONS (grade C minimum to unlock next)</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between"><span style="color:#39ff14">D7 Retention</span><span style="color:#555">S≥22% A≥18% B≥14% C≥10%</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#39ff14">D30 Retention</span><span style="color:#555">S≥8% A≥6% B≥4% C≥2%</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#ffb700">LTV</span><span style="color:#555">S≥$1.20 A≥$0.80 B≥$0.50 C≥$0.25</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#ffb700">ARPU</span><span style="color:#555">S≥$0.60 A≥$0.40 B≥$0.25 C≥$0.12</span></div>
+        </div>
+        <div style="color:#555;font-size:9px;margin-top:8px">UNLOCKED SLIDERS: 6 of 9</div>
+        <div style="color:#39ff14;font-size:9px">rewardRate · lootFrequency · dailyBonus · energyCost · ecpm · iapRate</div>
+        <div style="color:#333;font-size:9px">shopPrice · avgPurchaseValue · adFrequency — locked</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Grade Overlay (after running simulation)</h3>
+  <div class="mockup">
+    <div class="mockup-header">SIMULATION COMPLETE — GRADE BREAKDOWN</div>
+    <div class="mockup-body" style="padding:14px;font-family:monospace;font-size:11px">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+        <div style="border:1px solid #39ff14;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#555">D7 RETENTION</div>
+          <div style="font-size:22px;color:#39ff14;font-weight:bold">A</div>
+          <div style="font-size:9px;color:#555">19.2%</div>
+        </div>
+        <div style="border:1px solid #39ff14;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#555">D30 RETENTION</div>
+          <div style="font-size:22px;color:#39ff14;font-weight:bold">B</div>
+          <div style="font-size:9px;color:#555">4.8%</div>
+        </div>
+        <div style="border:1px solid #ffb700;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#555">LTV</div>
+          <div style="font-size:22px;color:#ffb700;font-weight:bold">A</div>
+          <div style="font-size:9px;color:#555">$0.91</div>
+        </div>
+        <div style="border:1px solid #ff4d6d;padding:8px;text-align:center">
+          <div style="font-size:9px;color:#555">ARPU</div>
+          <div style="font-size:22px;color:#ff4d6d;font-weight:bold">C</div>
+          <div style="font-size:9px;color:#555">$0.14</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2a2a3a;padding-top:12px">
+        <div>
+          <div style="font-size:9px;color:#555">OVERALL GRADE</div>
+          <div style="font-size:36px;color:#ffb700;font-weight:bold">B</div>
+          <div style="font-size:9px;color:#39ff14">✓ PASSED — LEVEL 4 UNLOCKED</div>
+        </div>
+        <div style="text-align:right;display:flex;flex-direction:column;gap:6px">
+          <div style="border:1px solid #39ff14;padding:6px 14px;color:#39ff14;cursor:pointer;font-size:11px">▶ NEXT CHALLENGE</div>
+          <div style="border:1px solid #555;padding:6px 14px;color:#555;cursor:pointer;font-size:11px">↺ RETRY FOR S</div>
+          <div style="border:1px solid #555;padding:6px 14px;color:#555;cursor:pointer;font-size:11px">⌂ CAREER HUB</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>All 6 Challenge Specs at a glance</h3>
+  <div style="font-family:monospace;font-size:10px;display:flex;flex-direction:column;gap:4px">
+    <div style="display:grid;grid-template-columns:80px 110px 1fr 60px;gap:8px;color:#555;padding:4px 0;border-bottom:1px solid #1a1a2e">
+      <span>LEVEL</span><span>ARCHETYPE</span><span>PRIMARY WIN CONDITIONS</span><span>SLIDERS</span>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 110px 1fr 60px;gap:8px;color:#ccc;padding:4px 0">
+      <span style="color:#39ff14">1 · HC</span><span>Hypercasual</span><span>D1 ≥ 35%, Ad Revenue ≥ $0.04/user, ARPU ≥ $0.08</span><span style="color:#555">4 of 9</span>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 110px 1fr 60px;gap:8px;color:#ccc;padding:4px 0">
+      <span style="color:#39ff14">2 · PZL</span><span>Casual Puzzle</span><span>D1 ≥ 42%, IAP conv ≥ 1%, Ad Revenue ≥ $0.06/user</span><span style="color:#555">5 of 9</span>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 110px 1fr 60px;gap:8px;color:#ccc;padding:4px 0">
+      <span style="color:#ffb700">3 · IDLE</span><span>Idle / Incremental</span><span>D7 ≥ 14%, D30 ≥ 4%, LTV ≥ $0.50, ARPU ≥ $0.25</span><span style="color:#555">6 of 9</span>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 110px 1fr 60px;gap:8px;color:#ccc;padding:4px 0">
+      <span style="color:#ffb700">4 · MID</span><span>Mid-Core RPG</span><span>D7 ≥ 18%, ARPPU ≥ $8, IAP conv ≥ 2%</span><span style="color:#555">8 of 9</span>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 110px 1fr 60px;gap:8px;color:#ccc;padding:4px 0">
+      <span style="color:#ff4d6d">5 · GTCH</span><span>Gacha</span><span>ARPPU ≥ $15, loot spikes ≥ 8, D30 ≥ 5%</span><span style="color:#555">9 of 9</span>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 110px 1fr 60px;gap:8px;color:#ccc;padding:4px 0">
+      <span style="color:#ff4d6d">6 · SUB</span><span>Subscription</span><span>D30 ≥ 12%, LTV ≥ $4, adFrequency = 0 (locked)</span><span style="color:#555">9 of 9*</span>
+    </div>
+  </div>
+</div>
