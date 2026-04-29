@@ -49,6 +49,7 @@ function SliderRow({
   testId,
   locked,
   lockedHint,
+  unit,
 }: {
   label: string;
   tooltip: string;
@@ -61,6 +62,7 @@ function SliderRow({
   testId: string;
   locked?: boolean;
   lockedHint?: string;
+  unit?: string;
 }) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -112,7 +114,7 @@ function SliderRow({
           )}
         </span>
         <span className="slider-value" style={{ color: accent }}>
-          {value}%
+          {value}{unit ?? "%"}
         </span>
       </div>
       <input
@@ -132,8 +134,8 @@ function SliderRow({
         data-testid={`${testId}-input`}
       />
       <div className="slider-track-labels">
-        <span>0%</span>
-        <span>100%</span>
+        <span>{min}{unit ?? "%"}</span>
+        <span>{max}{unit ?? "%"}</span>
       </div>
     </div>
   );
@@ -579,8 +581,7 @@ function PresetsCompareChart() {
   );
 }
 
-export default function Dashboard(props: { challengeSpec?: ChallengeSpec; params?: Record<string | number, string | undefined> }) {
-  const { challengeSpec } = props;
+export default function Dashboard({ challengeSpec }: { challengeSpec?: ChallengeSpec } = {}) {
   const { config, result, isRunning, updateConfig, runSim } = useSimulation();
 
   const isSliderAvailable = (key: keyof typeof config): boolean => {
@@ -592,7 +593,7 @@ export default function Dashboard(props: { challengeSpec?: ChallengeSpec; params
     if (challengeSpec?.lockedSliderValues) {
       updateConfig(challengeSpec.lockedSliderValues);
     }
-  }, [challengeSpec?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [challengeSpec, updateConfig]);
 
   return (
     <div className="dashboard">
@@ -711,7 +712,7 @@ export default function Dashboard(props: { challengeSpec?: ChallengeSpec; params
               accent={SINK_COLOR}
               testId="slider-ad-frequency"
               locked={!isSliderAvailable("adFrequency")}
-              lockedHint={!isSliderAvailable("adFrequency") ? "Always adjustable" : undefined}
+              lockedHint={!isSliderAvailable("adFrequency") ? "Locked to 0 for this challenge" : undefined}
             />
           </section>
 
@@ -736,6 +737,7 @@ export default function Dashboard(props: { challengeSpec?: ChallengeSpec; params
               testId="slider-ecpm"
               locked={!isSliderAvailable("ecpm")}
               lockedHint={!isSliderAvailable("ecpm") ? "Available from Level 1" : undefined}
+              unit="$"
             />
             <SliderRow
               label="IAP RATE"
@@ -762,6 +764,7 @@ export default function Dashboard(props: { challengeSpec?: ChallengeSpec; params
               testId="slider-avg-purchase"
               locked={!isSliderAvailable("avgPurchaseValue")}
               lockedHint={!isSliderAvailable("avgPurchaseValue") ? "Unlocks at Level 5" : undefined}
+              unit="$"
             />
           </section>
 

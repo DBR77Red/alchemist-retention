@@ -11,7 +11,7 @@ function Router() {
     <Switch>
       <Route path="/" component={CareerHub} />
       <Route path="/challenge/:id" component={ChallengePage} />
-      <Route path="/sandbox" component={Dashboard} />
+      <Route path="/sandbox">{() => <Dashboard />}</Route>
       <Route component={NotFound} />
     </Switch>
   );
