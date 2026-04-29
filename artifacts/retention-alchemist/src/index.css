@@ -1297,3 +1297,477 @@ body::after {
     gap: 4px;
   }
 }
+
+/* ── CAREER HUB ── */
+
+.career-hub {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.hub-body {
+  flex: 1;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hub-rank-bar {
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  background: var(--bg-panel);
+}
+
+.hub-rank-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.hub-rank-title {
+  color: var(--amber);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.hub-rank-progress {
+  color: var(--text-dim);
+  font-size: 10px;
+}
+
+.hub-rank-track {
+  height: 4px;
+  background: var(--bg-section);
+  width: 100%;
+}
+
+.hub-rank-fill {
+  height: 100%;
+  background: var(--amber);
+  transition: width 600ms ease;
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .hub-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── CHALLENGE CARDS ── */
+
+.challenge-card {
+  border: 1px solid var(--border);
+  padding: 14px;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color var(--transition);
+}
+
+.challenge-card--complete {
+  border-color: var(--green-dim);
+}
+
+.challenge-card--active {
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.12);
+}
+
+.challenge-card--locked {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.challenge-card-level {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+
+.challenge-card--active .challenge-card-level {
+  color: var(--cyan);
+}
+
+.challenge-card--complete .challenge-card-level {
+  color: var(--green-dim);
+}
+
+.challenge-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+
+.challenge-card-brief {
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.challenge-card-grade-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.challenge-card-grade-label {
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
+.challenge-card-grade {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.challenge-card-locked-hint {
+  font-size: 9px;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
+.challenge-card-cta {
+  border: 1px solid currentColor;
+  background: transparent;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: opacity var(--transition);
+  margin-top: 6px;
+}
+
+.challenge-card--complete .challenge-card-cta {
+  color: var(--green);
+}
+
+.challenge-card-cta:hover {
+  opacity: 0.75;
+}
+
+/* ── SANDBOX ROW ── */
+
+.hub-sandbox-row {
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  background: var(--bg-panel);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.hub-sandbox-label {
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
+.hub-sandbox-name {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.hub-sandbox-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.hub-sandbox-btn {
+  border: 1px solid var(--border-bright);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.hub-sandbox-btn:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+
+/* ── CHALLENGE PAGE ── */
+
+.challenge-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  position: relative;
+}
+
+.challenge-brief-header {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.challenge-brief-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.challenge-brief-meta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.challenge-brief-level {
+  font-size: 10px;
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+.challenge-brief-arch {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+.challenge-brief-sliders {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.challenge-brief-text {
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.6;
+  max-width: 680px;
+}
+
+.challenge-brief-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.challenge-brief-target {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.challenge-brief-target-label {
+  font-size: 9px;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.challenge-brief-target-thresholds {
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
+.challenge-brief-back {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition);
+  flex-shrink: 0;
+}
+
+.challenge-brief-back:hover {
+  color: var(--text);
+}
+
+/* ── LOCKED SLIDER ── */
+
+.slider-row--locked {
+  opacity: 0.35;
+}
+
+.slider-lock-icon {
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+.slider-lock-hint {
+  font-size: 9px;
+  color: var(--text-faint);
+  margin-top: 2px;
+}
+
+/* ── REVENUE SECTION HEADER ── */
+
+.revenue-header .section-title {
+  color: var(--cyan);
+}
+
+.revenue-header .section-icon {
+  color: var(--cyan);
+}
+
+/* ── REVENUE METRICS ROW ── */
+
+.metrics-row--revenue {
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+/* ── GRADE OVERLAY ── */
+
+.grade-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 22, 32, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.grade-overlay-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-bright);
+  padding: 24px;
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.grade-overlay-title {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+.grade-dimensions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+.grade-dimension-card {
+  border: 1px solid var(--border);
+  padding: 10px;
+  text-align: center;
+}
+
+.grade-dimension-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.grade-dimension-grade {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.grade-dimension-value {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.grade-overall-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  gap: 16px;
+}
+
+.grade-overall-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+
+.grade-overall-value {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.grade-overall-status {
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.grade-pass {
+  color: var(--green);
+}
+
+.grade-fail {
+  color: var(--red);
+}
+
+.grade-cta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  min-width: 160px;
+}
+
+.grade-cta {
+  border: 1px solid currentColor;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 7px 12px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-align: center;
+  transition: opacity var(--transition);
+}
+
+.grade-cta:hover {
+  opacity: 0.75;
+}
+
+.grade-cta--primary {
+  color: var(--green);
+}
+
+.grade-cta--secondary {
+  color: var(--amber);
+}
+
+.grade-cta--tertiary {
+  color: var(--text-dim);
+}
