@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useSimulation } from "@/context/SimulationContext";
 import type { Preset } from "@/context/SimulationContext";
 import type { AgentEvent } from "@/services/simulationEngine";
+import type { ChallengeSpec } from "@/data/challengeSpecs";
 import {
   AreaChart,
   Area,
@@ -46,6 +47,8 @@ function SliderRow({
   onChange,
   accent,
   testId,
+  locked,
+  lockedHint,
 }: {
   label: string;
   tooltip: string;
@@ -56,6 +59,8 @@ function SliderRow({
   onChange: (v: number) => void;
   accent: string;
   testId: string;
+  locked?: boolean;
+  lockedHint?: string;
 }) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -70,6 +75,18 @@ function SliderRow({
       window.removeEventListener("pointercancel", stop);
     };
   }, [isDragging]);
+
+  if (locked) {
+    return (
+      <div className="slider-row slider-row--locked" data-testid={testId}>
+        <div className="slider-header">
+          <span className="slider-label">{label}</span>
+          <span className="slider-lock-icon">🔒</span>
+        </div>
+        {lockedHint && <div className="slider-lock-hint">{lockedHint}</div>}
+      </div>
+    );
+  }
 
   return (
     <div className="slider-row" data-testid={testId}>
@@ -562,8 +579,20 @@ function PresetsCompareChart() {
   );
 }
 
-export default function Dashboard() {
+export default function Dashboard(props: { challengeSpec?: ChallengeSpec; params?: Record<string | number, string | undefined> }) {
+  const { challengeSpec } = props;
   const { config, result, isRunning, updateConfig, runSim } = useSimulation();
+
+  const isSliderAvailable = (key: keyof typeof config): boolean => {
+    if (!challengeSpec) return true;
+    return challengeSpec.availableSliders.includes(key);
+  };
+
+  useEffect(() => {
+    if (challengeSpec?.lockedSliderValues) {
+      updateConfig(challengeSpec.lockedSliderValues);
+    }
+  }, [challengeSpec?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="dashboard">
@@ -605,6 +634,8 @@ export default function Dashboard() {
               onChange={(v) => updateConfig({ rewardRate: v })}
               accent={FAUCET_COLOR}
               testId="slider-reward-rate"
+              locked={!isSliderAvailable("rewardRate")}
+              lockedHint={!isSliderAvailable("rewardRate") ? "Available from Level 2" : undefined}
             />
             <SliderRow
               label="LOOT FREQUENCY"
@@ -616,6 +647,8 @@ export default function Dashboard() {
               onChange={(v) => updateConfig({ lootFrequency: v })}
               accent={FAUCET_COLOR}
               testId="slider-loot-frequency"
+              locked={!isSliderAvailable("lootFrequency")}
+              lockedHint={!isSliderAvailable("lootFrequency") ? "Available from Level 1" : undefined}
             />
             <SliderRow
               label="DAILY BONUS"
@@ -627,6 +660,8 @@ export default function Dashboard() {
               onChange={(v) => updateConfig({ dailyBonus: v })}
               accent={FAUCET_COLOR}
               testId="slider-daily-bonus"
+              locked={!isSliderAvailable("dailyBonus")}
+              lockedHint={!isSliderAvailable("dailyBonus") ? "Unlocks at Level 2" : undefined}
             />
           </section>
 
@@ -649,6 +684,8 @@ export default function Dashboard() {
               onChange={(v) => updateConfig({ energyCost: v })}
               accent={SINK_COLOR}
               testId="slider-energy-cost"
+              locked={!isSliderAvailable("energyCost")}
+              lockedHint={!isSliderAvailable("energyCost") ? "Unlocks at Level 3" : undefined}
             />
             <SliderRow
               label="SHOP PRICE"
@@ -660,6 +697,8 @@ export default function Dashboard() {
               onChange={(v) => updateConfig({ shopPrice: v })}
               accent={SINK_COLOR}
               testId="slider-shop-price"
+              locked={!isSliderAvailable("shopPrice")}
+              lockedHint={!isSliderAvailable("shopPrice") ? "Unlocks at Level 4" : undefined}
             />
             <SliderRow
               label="AD FREQUENCY"
@@ -671,6 +710,58 @@ export default function Dashboard() {
               onChange={(v) => updateConfig({ adFrequency: v })}
               accent={SINK_COLOR}
               testId="slider-ad-frequency"
+              locked={!isSliderAvailable("adFrequency")}
+              lockedHint={!isSliderAvailable("adFrequency") ? "Always adjustable" : undefined}
+            />
+          </section>
+
+          <div className="section-divider" />
+
+          <section className="control-section" data-testid="revenue-section">
+            <div className="section-header revenue-header">
+              <span className="section-icon">◈</span>
+              <span className="section-title">REVENUE</span>
+              <span className="section-sub">monetization inputs</span>
+            </div>
+
+            <SliderRow
+              label="AD VALUE (eCPM)"
+              tooltip="Earnings per ad impression. Each fired ad event adds ecpm × $0.001 to player revenue. Higher eCPM = premium ad network."
+              value={config.ecpm}
+              min={0}
+              max={20}
+              step={1}
+              onChange={(v) => updateConfig({ ecpm: v })}
+              accent="#00d4ff"
+              testId="slider-ecpm"
+              locked={!isSliderAvailable("ecpm")}
+              lockedHint={!isSliderAvailable("ecpm") ? "Available from Level 1" : undefined}
+            />
+            <SliderRow
+              label="IAP RATE"
+              tooltip="Base % of players willing to spend. Dopamine-weighted at init — high-reward games convert more. Conversion day is random within the 30-day window."
+              value={config.iapRate}
+              min={0}
+              max={100}
+              step={1}
+              onChange={(v) => updateConfig({ iapRate: v })}
+              accent="#00d4ff"
+              testId="slider-iap-rate"
+              locked={!isSliderAvailable("iapRate")}
+              lockedHint={!isSliderAvailable("iapRate") ? "Unlocks at Level 4" : undefined}
+            />
+            <SliderRow
+              label="AVG PURCHASE $"
+              tooltip="Average dollar value per IAP transaction. Set high for whale-driven gacha; low for mass-market micro-transactions."
+              value={config.avgPurchaseValue}
+              min={1}
+              max={50}
+              step={1}
+              onChange={(v) => updateConfig({ avgPurchaseValue: v })}
+              accent="#00d4ff"
+              testId="slider-avg-purchase"
+              locked={!isSliderAvailable("avgPurchaseValue")}
+              lockedHint={!isSliderAvailable("avgPurchaseValue") ? "Unlocks at Level 5" : undefined}
             />
           </section>
 
@@ -728,6 +819,41 @@ export default function Dashboard() {
               testId="metric-d30"
             />
           </div>
+
+          {result && (
+            <div className="metrics-row metrics-row--revenue" data-testid="revenue-metrics">
+              <MetricCard
+                label="ARPU"
+                value={result ? `$${result.arpu.toFixed(3)}` : "—"}
+                subtitle="avg rev / user"
+                testId="metric-arpu"
+              />
+              <MetricCard
+                label="ARPPU"
+                value={result ? `$${result.arppu.toFixed(2)}` : "—"}
+                subtitle="avg rev / payer"
+                testId="metric-arppu"
+              />
+              <MetricCard
+                label="IAP CONV"
+                value={result ? result.iapConvRate.toFixed(1) : "—"}
+                subtitle="% converted"
+                testId="metric-iap-conv"
+              />
+              <MetricCard
+                label="AD REV"
+                value={result ? `$${result.adRevTotal.toFixed(2)}` : "—"}
+                subtitle="total ad ($)"
+                testId="metric-ad-rev"
+              />
+              <MetricCard
+                label="LTV"
+                value={result ? `$${result.ltv.toFixed(3)}` : "—"}
+                subtitle="lifetime value"
+                testId="metric-ltv"
+              />
+            </div>
+          )}
 
           <div className="chart-panel" data-testid="chart-retention">
             <div className="chart-header">
